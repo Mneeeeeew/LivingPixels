@@ -7,3 +7,9 @@ artifacts/
 *.npz
 artifacts/*.png
 artifacts/*.gif
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*

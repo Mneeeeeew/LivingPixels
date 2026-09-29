@@ -4,21 +4,21 @@ LivingPixels is a neural cellular automaton (NCA) that grows a small RGBA image 
 
 ![LivingPixels growth and regeneration](assets/livingpixels.gif)
 
-The project is designed as an inspectable experiment rather than a black-box image generator. Every cell shares one local update rule, while the hidden channels act as distributed memory.
+The project is an inspectable experiment rather than a black-box image generator. Every cell shares one local update rule, while hidden channels act as distributed memory.
 
 ## Demo
 
-The browser demo runs the trained rule on a pixel canvas. It supports pause/play, reset, button-based damage, and erasing cells with the mouse.
+The browser demo supports pause/play, reset, button-based damage, and erasing cells with the mouse.
 
-It also has a custom-target workflow:
+It also supports custom targets:
 
-1. draw a 32×32 RGBA target in the **Draw target** canvas;
-2. choose the brush color, brush size, or eraser;
+1. draw a 32x32 RGBA target in the **Draw target** canvas;
+2. choose a brush color, brush size, or eraser;
 3. click **Train drawn target**;
 4. wait for the local Python API to train a new NCA;
 5. reset or damage the resulting organism and observe regeneration.
 
-The training request stays on the local machine. The browser sends only the 32×32 target to `serve_demo.py`; the resulting user model is saved under `artifacts/user-model.npz`.
+The training request stays on the local machine. The browser sends only the 32x32 target to `serve_demo.py`; the user model is saved under `artifacts/user-model.npz`.
 
 ```powershell
 python serve_demo.py
@@ -47,29 +47,27 @@ python generate_gif.py artifacts/livingpixels-pool.npz
 python serve_demo.py
 ```
 
-If `python` is not available on Windows, use the bundled Python runtime from the Codex desktop environment:
+Install Python 3.10+ and the dependencies with:
 
 ```powershell
-$py = "C:\Users\Пользователь\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
-& $py train.py --pool --iterations 2000 --steps 64 --pool-size 512 `
-  --output artifacts\livingpixels-pool.npz
+python -m pip install numpy Pillow
 ```
 
 ## Architecture
 
-The internal state has shape `B × 16 × 32 × 32`:
+The internal state has shape `B x 16 x 32 x 32`:
 
 - channels `0:4` are rendered as RGBA;
 - channels `4:16` are hidden state;
 - perception contains identity, Sobel X, and Sobel Y responses;
-- the shared update network is `48 → 64 → 16` with ReLU;
+- the shared update network is `48 -> 64 -> 16` with ReLU;
 - the last layer starts at zero, so the initial rule is an identity update;
 - cells update asynchronously with probability `p = 0.5`;
-- a 3×3 alpha neighborhood controls which cells are alive and allowed to update.
+- a 3x3 alpha neighborhood controls which cells are alive and allowed to update.
 
 ## Training
 
-The default target is a deterministic 32×32 pixel organism. Training uses truncated rollout backpropagation and Adam. Pool training keeps intermediate states between iterations, resets part of each batch to a fresh seed, and occasionally damages non-seed states. This exposes the model to different growth stages and regeneration situations.
+The default target is a deterministic 32x32 pixel organism. Training uses truncated rollout backpropagation and Adam. Pool training keeps intermediate states between iterations, resets part of each batch to a fresh seed, and occasionally damages non-seed states.
 
 ```powershell
 python train.py --pool --iterations 2000 --steps 64 `
@@ -92,13 +90,9 @@ python evaluate.py artifacts/livingpixels-pool.npz `
   --output-dir artifacts/damage-sweep
 ```
 
-The command writes:
+The command writes `results.json`, `results.csv`, and `success-rate.svg`.
 
-- `results.json` — machine-readable results;
-- `results.csv` — spreadsheet-friendly results;
-- `success-rate.svg` — success rate versus damage fraction.
-
-### Final 32×32 checkpoint
+### Final 32x32 checkpoint
 
 The published development run used seed `7`, 500 pool iterations, 32 rollout steps, a pool of 64 states, and batch size 4. The final no-damage preview loss was `0.039694`. The damage sweep used 20 trials per setting and 128 repair steps:
 
@@ -107,7 +101,7 @@ The published development run used seed `7`, 500 pool iterations, 32 rollout ste
 | Circle success rate | 100% | 100% | 100% | 15% |
 | Random success rate | 100% | 100% | 100% | 100% |
 
-The 70% circle result is intentionally included: it shows the current robustness boundary instead of hiding failure cases.
+The 70% circle result is included to show the current robustness boundary instead of hiding failure cases.
 
 ## Repository layout
 
@@ -117,9 +111,11 @@ livingpixels/
   training.py     # manual backpropagation, Adam, pool training
   evaluation.py   # recovery criteria and damage sweep
   targets.py      # deterministic target organism
+  web.py          # browser checkpoint serialization
 train.py          # training CLI
 evaluate.py       # evaluation CLI
 generate_gif.py   # growth and regeneration animation
+serve_demo.py     # static server plus local training API
 demo/             # zero-dependency browser canvas demo
 tests/            # regression and numerical smoke tests
 ```
@@ -130,4 +126,6 @@ This is a research prototype trained on one fixed target. It does not yet claim 
 
 ## License
 
-Add a license before publishing the repository publicly.
+LivingPixels is licensed under the MIT License. See [LICENSE](LICENSE).
+
+Third-party dependencies remain under their respective licenses.
