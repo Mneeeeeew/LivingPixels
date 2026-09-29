@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LivingPixels</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-monospace, Consolas, monospace; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #081018; color: #d8f4ff; }
+    main { width: min(92vw, 760px); padding: 32px 0; } h1 { margin: 0 0 8px; } p { color: #8aabb9; line-height: 1.5; }
+    .stage { border: 1px solid #1c5566; padding: 12px; background: #0a1720; } canvas { display: block; width: min(80vw, 640px); height: min(80vw, 640px); image-rendering: pixelated; background: #03070a; margin: auto; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; } button { background: #102a35; color: #d8f4ff; border: 1px solid #28758a; padding: 9px 12px; font: inherit; cursor: pointer; }
+    .stats { display: flex; gap: 20px; color: #79d7e7; font-size: .85rem; margin-top: 12px; } #status { color: #ffcb6b; min-height: 1.2em; }
+  </style>
+</head>
+<body><main>
+  <h1>LivingPixels</h1>
+  <p>A shared local rule grows an RGBA organism from one seed cell. Damage it with the mouse and watch the distributed state attempt to repair itself.</p>
+  <div class="stage"><canvas id="canvas" width="32" height="32"></canvas></div>
+  <div class="controls"><button id="reset">Reset seed</button><button id="pause">Pause</button><button data-damage="0.25">Damage 25%</button><button data-damage="0.50">Damage 50%</button><button id="random">Random damage</button></div>
+  <div class="stats"><span id="step">step=0</span><span id="fps">fps=—</span></div><div id="status">Loading checkpoint…</div>
+</main><script src="app.js" type="module"></script></body>
+</html>
+
