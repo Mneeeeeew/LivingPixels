@@ -10,8 +10,17 @@ The project is designed as an inspectable experiment rather than a black-box ima
 
 The browser demo runs the trained rule on a pixel canvas. It supports pause/play, reset, button-based damage, and erasing cells with the mouse.
 
+It also has a custom-target workflow:
+
+1. draw a 32×32 RGBA target in the **Draw target** canvas;
+2. choose the brush color, brush size, or eraser;
+3. click **Train drawn target**;
+4. wait for the local Python API to train a new NCA;
+5. reset or damage the resulting organism and observe regeneration.
+
+The training request stays on the local machine. The browser sends only the 32×32 target to `serve_demo.py`; the resulting user model is saved under `artifacts/user-model.npz`.
+
 ```powershell
-python export_web.py artifacts/livingpixels-pool.npz
 python serve_demo.py
 ```
 

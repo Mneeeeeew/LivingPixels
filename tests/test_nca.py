@@ -6,6 +6,7 @@ from livingpixels.evaluation import damage_sweep, is_recovered
 from livingpixels.nca import NCA, NCAConfig, mse_rgba
 from livingpixels.targets import living_pixel_target
 from livingpixels.training import PoolConfig, fit_pool, train_step
+from livingpixels.web import model_payload
 
 
 class NCATest(unittest.TestCase):
@@ -37,7 +38,12 @@ class NCATest(unittest.TestCase):
         self.assertTrue(0 <= results[0].success_rate <= 1)
         self.assertGreaterEqual(mse_rgba(self.model.seed_state(size=16), target), 0)
 
+    def test_browser_payload_contains_serialized_weights(self):
+        payload = model_payload(self.model)
+        self.assertEqual(payload["channels"], 16)
+        self.assertEqual(len(payload["w1"]), 48 * 8)
+        self.assertEqual(len(payload["w2"]), 8 * 16)
+
 
 if __name__ == "__main__":
     unittest.main()
-

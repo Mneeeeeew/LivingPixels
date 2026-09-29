@@ -7,18 +7,33 @@
   <style>
     :root { color-scheme: dark; font-family: ui-monospace, Consolas, monospace; }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #081018; color: #d8f4ff; }
-    main { width: min(92vw, 760px); padding: 32px 0; } h1 { margin: 0 0 8px; } p { color: #8aabb9; line-height: 1.5; }
-    .stage { border: 1px solid #1c5566; padding: 12px; background: #0a1720; } canvas { display: block; width: min(80vw, 640px); height: min(80vw, 640px); image-rendering: pixelated; background: #03070a; margin: auto; }
-    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; } button { background: #102a35; color: #d8f4ff; border: 1px solid #28758a; padding: 9px 12px; font: inherit; cursor: pointer; }
+    main { width: min(94vw, 900px); padding: 28px 0; }
+    h1 { margin: 0 0 8px; } h2 { font-size: .9rem; color: #79d7e7; margin: 0 0 8px; }
+    p { color: #8aabb9; line-height: 1.5; } .editors { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .panel { border: 1px solid #1c5566; padding: 12px; background: #0a1720; }
+    canvas { display: block; width: min(40vw, 390px); height: min(40vw, 390px); image-rendering: pixelated; background: #03070a; margin: auto; touch-action: none; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+    button, input { font: inherit; } button { background: #102a35; color: #d8f4ff; border: 1px solid #28758a; padding: 9px 12px; cursor: pointer; } button:disabled { opacity: .45; cursor: wait; }
+    input[type="number"] { width: 70px; background: #0a1720; color: #d8f4ff; border: 1px solid #28758a; padding: 8px; }
+    input[type="color"] { width: 42px; height: 32px; padding: 0; border: 1px solid #28758a; background: transparent; }
     .stats { display: flex; gap: 20px; color: #79d7e7; font-size: .85rem; margin-top: 12px; } #status { color: #ffcb6b; min-height: 1.2em; }
+    @media (max-width: 650px) { .editors { grid-template-columns: 1fr; } canvas { width: min(82vw, 390px); height: min(82vw, 390px); } }
   </style>
 </head>
 <body><main>
   <h1>LivingPixels</h1>
-  <p>A shared local rule grows an RGBA organism from one seed cell. Damage it with the mouse and watch the distributed state attempt to repair itself.</p>
-  <div class="stage"><canvas id="canvas" width="32" height="32"></canvas></div>
-  <div class="controls"><button id="reset">Reset seed</button><button id="pause">Pause</button><button data-damage="0.25">Damage 25%</button><button data-damage="0.50">Damage 50%</button><button id="random">Random damage</button></div>
-  <div class="stats"><span id="step">step=0</span><span id="fps">fps=—</span></div><div id="status">Loading checkpoint…</div>
+  <p>Draw a 32×32 target, train a local neural cellular rule for it, then damage the grown organism and watch it attempt to regenerate.</p>
+  <div class="editors">
+    <section class="panel"><h2>1. Draw target</h2><canvas id="targetCanvas" width="32" height="32"></canvas>
+      <div class="controls"><label>Color <input id="brushColor" type="color" value="#25d9f0" /></label><label>Size <input id="brushSize" type="number" min="1" max="4" value="2" /></label><label><input id="eraser" type="checkbox" /> Eraser</label></div>
+      <div class="controls"><button id="clearTarget">Clear</button><button id="presetTarget">Preset</button></div>
+    </section>
+    <section class="panel"><h2>2. Living organism</h2><canvas id="canvas" width="32" height="32"></canvas>
+      <div class="controls"><button id="reset">Reset seed</button><button id="pause">Pause</button><button data-damage="0.25">Damage 25%</button><button data-damage="0.50">Damage 50%</button><button id="random">Random damage</button></div>
+    </section>
+  </div>
+  <div class="controls"><label>Training iterations <input id="iterations" type="number" min="1" max="2000" value="300" /></label><button id="train" disabled>Train drawn target</button></div>
+  <div class="stats"><span id="step">step=0</span><span id="fps">fps=—</span></div><div id="status">Loading model…</div>
 </main><script src="app.js" type="module"></script></body>
 </html>
 
